@@ -76,8 +76,9 @@ elif choice == "CRUD Operations":
     action = st.selectbox("Select Action", ["Select", "Add", "Update", "Delete"])
     if action != "Select":
         table = st.selectbox("Select Table", ["providers", "receivers", "food_listing", "claims"])
+        #Add
         if action == "Add":
-            with st.form("add_form"):
+            with st.form(f"add_form_{table.lower()}"):
                 if table == "providers":
                     Provider_ID = st.number_input("Provider_ID", step = 1)
                     name = st.text_input("Provider_Name")
@@ -90,7 +91,42 @@ elif choice == "CRUD Operations":
                         cursor.execute("INSERT INTO providers (Provider_ID, Name, Type, Address, City, Contact) VALUES (?, ?, ?, ?, ?, ?)", (Provider_ID, name, Type, Address, City, contact))
                         connection.commit()
                         st.success("Provider added successfully")
+            
+                elif table == "receivers":
+                    Receiver_ID = st.number_input("Receiver_ID", step = 1)
+                    Name = st.text_input("Receiver_Name")
+                    Type = st.text_input("Receiver_Type")
+                    City = st.text_input("City")
+                    contact = st.text_input("Contact")
+                    submitted = st.form_submit_button("Add Receiver")
+                    if submitted and Receiver_ID and Name and Type and City and contact:
+                        cursor.execute("INSERT INTO receivers (Receiver_ID, Name, Type, City, Contact) VALUES (?, ?, ?, ?, ?)", (Receiver_ID, Name, Type, City, contact))
+                        connection.commit()
+                        st.success("Receiver added successfully")
+            
+                elif table == "food_listing":
+                    Food_ID = st.number_input("Food_ID", step = 1)
+                    Food_Name = st.text_input("Food_Name")
+                    Quantity = st.number_input("Quantity", step = 1)
+                    Location = st.text_input("Location")
+                    Food_Type = st.text_input("Food_Type")
+                    Meal_Type = st.text_input("Meal_Type")
+                    submitted = st.form_submit_button("Add Food details")
+                    if submitted and Food_ID and Food_Name and Quantity and Location and Food_Type and Meal_Type:
+                        cursor.execute("INSERT INTO food_listing(Food_ID, Food_Name, Quantity, Location, Food_Type, Meal_Type) VALUES (?, ?, ?, ?, ?, ?)", (Food_ID, Food_Name, Quantity, Location, Food_Type, Meal_Type))
+                        connection.commit()
+                        st.success("Food details added successfully")
+            
+                elif table == "claims":
+                    Claim_ID = st.number_input("Claim_ID")
+                    Status = st.text_input("Status")
+                    submitted = st.form_submit_button("Add claims")
+                    if submitted and Claim_ID and Status:
+                        cursor.execute("INSERT INTO claims (Claim_ID, Status) VALUES (?, ?)", (Claim_ID, Status))
+                        connection.commit()
+                        st.success("Claims added successfully")
 
+        # Update
         elif action == "Update":
             if table == "food_listing":
                 new_Meal_type = st.text_input("New Meal Type")
@@ -101,12 +137,67 @@ elif choice == "CRUD Operations":
                     cursor.execute("UPDATE 'food_listing' SET Meal_Type = ?, Quantity = ?, Location = ? WHERE Food_ID = ?", (new_Meal_type, new_quantity, new_location, Food_ID))
                     connection.commit()
                     st.success("Listing updated successfully")
+        
 
+            elif table == "providers":
+                New_Name = st.text_input("Name")
+                New_Type = st.text_input("Type")
+                New_Address = st.text_area("Address")
+                New_City = st.text_input("City")
+                New_Contact = st.text_input("Contact")
+                Provider_ID = st.number_input("Provider_ID", step = 1)
+                if st.button("Update Providers list"):
+                    cursor.execute("UPDATE 'providers' SET Name = ?, Type = ?, Address = ?, City = ?, Contact = ? WHERE Provider_ID = ?", (New_Name,New_Type, New_Address, New_City, New_Contact, Provider_ID))
+                    connection.commit()
+                    st.success("Provider updated successfully")
+
+            elif table == "receivers":
+                New_Name = st.text_input("Name")
+                New_Type = st.text_input("Type")
+                New_City = st.text_input("City")
+                New_Contact = st.text_input("Contact")
+                Receiver_ID = st.number_input("Receiver_ID", step = 1)
+                if st.button("Update Receiver list"):
+                    cursor.execute("UPDATE 'receivers' SET Name = ?, Type = ?, City = ?, Contact = ? WHERE Receiver_ID = ?", (New_Name,New_Type, New_City, New_Contact, Receiver_ID))
+                    connection.commit()
+                    st.success("Receiver updated successfully")
+
+            elif table == 'claims':
+                New_Status = st.text_input("Status")
+                Claim_ID = st.number_input("Claim_ID", step = 1)
+                if st.button("Update claims"):
+                    cursor.execute("UPDATE 'claims' SET Status = ? WHERE Claim_ID = ?", (New_Status, Claim_ID))
+                    connection.commit()
+                    st.success("Claim status updated successfully")
+                
+
+        # Delete
         elif action == "Delete":
             if table == "receivers":
                 Receiver_ID = st.number_input("Enter Receiver ID to Delete", step=1)
                 if st.button("Delete Record"):
                     cursor.execute(f"DELETE FROM '{table}' WHERE Receiver_ID = ?", (Receiver_ID,))
+                    connection.commit()
+                    st.success("Record deleted successfully")
+
+            elif table == "providers":
+                Provider_ID = st.number_input("Enter Provider ID to Delete", step = 1)
+                if st.button("Delete Record"):
+                    cursor.execute(f"DELETE FROM '{table}' WHERE Provider_ID = ?", (Provider_ID))
+                    connection.commit()
+                    st.success("Record deleted successfully")         
+ 
+            elif table == "food_listing":
+                Food_ID = st.number_input("Enter Food ID to Delete", step = 1)
+                if st.button("Delete Record"):
+                    cursor.execute(f"DELETE FROM '{table}' WHERE Food_ID = ?", (Food_ID))
+                    connection.commit()
+                    st.success("Record deleted successfully")
+
+            elif table == "claims":
+                Claim_ID = st.number_input("Enter Provider ID to Delete", step = 1)
+                if st.button("Delete Record"):
+                    cursor.execute(f"DELETE FROM '{table}' WHERE Claim_ID = ?", (Claim_ID))
                     connection.commit()
                     st.success("Record deleted successfully")
 
